@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "AppAgricolaVisitas",
+    "slug": "app-agricola-visitas",
+    "version": "2.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F4F6F9"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Este aplicativo precisa acessar a câmera para o registro fotográfico da auditoria técnica.",
+        "NSPhotoLibraryUsageDescription": "Este aplicativo precisa acessar sua galeria de fotos.",
+        "NSContactsUsageDescription": "Este aplicativo precisa acessar seus contatos para vincular o produtor rural à visita.",
+        "NSLocationWhenInUseUsageDescription": "Este aplicativo precisa da sua localização para georreferenciar a visita técnica.",
+        "NSMotionUsageDescription": "Este aplicativo utiliza o acelerômetro para detectar instabilidade física durante o fechamento da auditoria."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F4F6F9"
+      },
+      "permissions": [
+        "CAMERA",
+        "READ_CONTACTS",
+        "WRITE_CONTACTS",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
