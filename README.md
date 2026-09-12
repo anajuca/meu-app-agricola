@@ -16,32 +16,7 @@ emulador com `npx expo start --android` / `--ios`.
 
 > Pré-requisitos: Node.js instalado e Expo CLI (`npm install -g expo-cli`, opcional).
 
-### Solução de problemas comuns (ERESOLVE / conflito de dependências)
 
-Se aparecer um erro `ERESOLVE unable to resolve dependency tree` mencionando
-`react-dom` ou `react-native-web`, é porque o `npm` tentou instalar uma
-versão de `react-dom` mais nova que a exigida pelo Expo SDK 51 (que usa
-`react@18.2.0`). O `package.json` deste projeto já fixa as versões corretas
-(`react-dom@18.2.0` e `react-native-web@~0.19.10`), então basta:
-
-```bash
-rm -rf node_modules package-lock.json   # no Windows (PowerShell): rd /s /q node_modules & del package-lock.json
-npm install
-```
-
-Se mesmo assim o conflito persistir (por exemplo, ao instalar algum pacote
-extra manualmente), use:
-
-```bash
-npm install --legacy-peer-deps
-```
-
-Ou, preferencialmente, deixe o próprio Expo escolher versões compatíveis ao
-adicionar novas bibliotecas:
-
-```bash
-npx expo install nome-do-pacote
-```
 
 ## Estrutura do projeto
 
@@ -111,23 +86,3 @@ por exemplo, GPS desligado, câmera ausente ou sensor indisponível.
 `src/styles/globalStyles.js` e o menu em `App.js` usam `Dimensions` /
 `useWindowDimensions` para adaptar a largura dos cards e o número de
 colunas conforme o tamanho da tela e a orientação (retrato/paisagem).
-
-## Observação sobre a rolagem da tela (correção aplicada)
-
-A tela `RegistroVisitaScreen.js` não usa mais um `ScrollView` com um
-`FlatList` de contatos aninhado dentro dele — essa combinação trava o
-gesto de rolagem no Android (é um antipadrão avisado pelo próprio React
-Native: "VirtualizedLists should never be nested inside plain ScrollViews
-with the same orientation"). Agora a tela inteira é **um único `FlatList`**:
-as seções de GPS e foto formam o `ListHeaderComponent`, os contatos são o
-`data` paginado, e o botão "Finalizar" é o `ListFooterComponent`. Isso
-resolve o travamento e mantém a rolagem funcionando mesmo com foto e
-localização preenchidas.
-
-## Observação sobre emuladores
-
-O acelerômetro pode não estar disponível em alguns emuladores. Nesse caso,
-`Accelerometer.isAvailableAsync()` retorna `false` e a trava de segurança é
-ignorada (RNF01), permitindo que o restante do fluxo funcione normalmente.
-Em dispositivo físico, é possível testar o Nível Pleno sacudindo o aparelho
-durante o toque em "Finalizar e Assinar Auditoria".
