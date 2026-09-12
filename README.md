@@ -28,15 +28,15 @@ meu-app-agricola/
 └── src/
     ├── components/
     │   ├── BotaoCustomizado.js
-    │   ├── IndicadorPrecisaoGPS.js   (RF02)
-    │   └── ItemContato.js            (Nível Sênior)
+    │   ├── IndicadorPrecisaoGPS.js
+    │   └── ItemContato.js
     ├── screens/
-    │   ├── RegistroVisitaScreen.js   (tela principal — todos os desafios)
-    │   └── HistoricoScreen.js        (RF01)
+    │   ├── RegistroVisitaScreen.js
+    │   └── HistoricoScreen.js
     ├── styles/
-    │   └── globalStyles.js           (RNF02)
+    │   └── globalStyles.js
     └── utils/
-        └── storage.js                (RF01)
+        └── storage.js
 ```
 
 ## Onde cada exigência foi implementada
