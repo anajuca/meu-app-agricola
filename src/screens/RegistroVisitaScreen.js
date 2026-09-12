@@ -8,6 +8,7 @@ import {
   TextInput,
   Linking,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
@@ -19,17 +20,6 @@ import BotaoCustomizado from '../components/BotaoCustomizado';
 import IndicadorPrecisaoGPS from '../components/IndicadorPrecisaoGPS';
 import ItemContato from '../components/ItemContato';
 import { salvarVisita } from '../utils/storage';
-import {
-  View,
-  Text,
-  Alert,
-  Image,
-  FlatList,
-  TextInput,
-  Linking,
-  ActivityIndicator,
-  Platform,
-} from 'react-native';
 
 const TAMANHO_PAGINA = 20;
 const ACELERACAO_LIMITE_G = 2.0;
@@ -47,6 +37,7 @@ export default function RegistroVisitaScreen() {
   const [paginaAtual, setPaginaAtual] = useState(0);
   const [temMaisContatos, setTemMaisContatos] = useState(true);
   const [buscaIniciada, setBuscaIniciada] = useState(false);
+  const [listaContatosVisivel, setListaContatosVisivel] = useState(false);
   const [carregandoContatos, setCarregandoContatos] = useState(false);
   const [carregandoMaisContatos, setCarregandoMaisContatos] = useState(false);
   const idBuscaDebounce = useRef(null);
@@ -88,6 +79,11 @@ export default function RegistroVisitaScreen() {
   };
 
   const capturarFotoEvidencia = async () => {
+    if (Platform.OS === 'web') {
+      Alert.alert('Indisponível no Navegador', 'A captura de foto pela câmera só funciona em um dispositivo físico ou emulador (Expo Go).');
+      return;
+    }
+
     try {
       const permissaoResultado = await ImagePicker.requestCameraPermissionsAsync();
 
@@ -167,9 +163,19 @@ export default function RegistroVisitaScreen() {
 
   const iniciarBuscaDeContatos = () => {
     setBuscaIniciada(true);
+    setListaContatosVisivel(true);
     setPaginaAtual(0);
     setTemMaisContatos(true);
     buscarPaginaDeContatos(0, true, termoBusca);
+  };
+
+  const selecionarContato = (item) => {
+    setContatoSelecionado(item);
+    setListaContatosVisivel(false);
+  };
+
+  const trocarProdutor = () => {
+    setListaContatosVisivel(true);
   };
 
   const aoDigitarBusca = (texto) => {
@@ -251,6 +257,7 @@ export default function RegistroVisitaScreen() {
       setContatos([]);
       setTermoBusca('');
       setBuscaIniciada(false);
+      setListaContatosVisivel(false);
     } catch (erro) {
       Alert.alert('Erro ao Salvar', 'Não foi possível salvar o registro localmente. Tente novamente.');
     } finally {
@@ -286,19 +293,26 @@ export default function RegistroVisitaScreen() {
       <View style={[globalStyles.cardVisita, { paddingBottom: 8 }]}>
         <Text style={globalStyles.tituloSecao}>3. Produtor / Representante Logístico</Text>
 
-        <BotaoCustomizado
-          titulo={!buscaIniciada ? 'Buscar Produtores na Agenda' : 'Atualizar Lista'}
-          onPress={iniciarBuscaDeContatos}
-          tipo="primary"
-        />
+        {!contatoSelecionado || listaContatosVisivel ? (
+          <BotaoCustomizado
+            titulo={!buscaIniciada ? 'Buscar Produtores na Agenda' : 'Atualizar Lista'}
+            onPress={iniciarBuscaDeContatos}
+            tipo="primary"
+          />
+        ) : null}
 
         {contatoSelecionado && (
-          <Text style={[globalStyles.textoInformativo, { color: '#27AE60', fontWeight: 'bold', marginVertical: 6 }]}>
-            Vinculado a: {contatoSelecionado.name}
-          </Text>
+          <>
+            <Text style={[globalStyles.textoInformativo, { color: '#27AE60', fontWeight: 'bold', marginVertical: 6 }]}>
+              Vinculado a: {contatoSelecionado.name}
+            </Text>
+            {!listaContatosVisivel && (
+              <BotaoCustomizado titulo="Trocar Produtor" onPress={trocarProdutor} tipo="warning" />
+            )}
+          </>
         )}
 
-        {buscaIniciada && (
+        {buscaIniciada && listaContatosVisivel && (
           <TextInput
             style={globalStyles.inputBusca}
             placeholder="Buscar por nome do produtor..."
@@ -307,7 +321,7 @@ export default function RegistroVisitaScreen() {
           />
         )}
 
-        {carregandoContatos && contatos.length === 0 && (
+        {listaContatosVisivel && carregandoContatos && contatos.length === 0 && (
           <ActivityIndicator style={{ marginVertical: 12 }} color="#2980B9" />
         )}
       </View>
@@ -316,7 +330,9 @@ export default function RegistroVisitaScreen() {
 
   const renderizarRodape = () => (
     <View>
-      {carregandoMaisContatos && <ActivityIndicator style={{ marginVertical: 10 }} color="#2980B9" />}
+      {listaContatosVisivel && carregandoMaisContatos && (
+        <ActivityIndicator style={{ marginVertical: 10 }} color="#2980B9" />
+      )}
       <View style={{ paddingHorizontal: 4 }}>
         <BotaoCustomizado
           titulo={verificandoEstabilidade ? 'Verificando Estabilidade...' : 'Finalizar e Assinar Auditoria'}
@@ -331,19 +347,19 @@ export default function RegistroVisitaScreen() {
   return (
     <FlatList
       style={globalStyles.container}
-      data={contatos}
+      data={listaContatosVisivel ? contatos : []}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <ItemContato
           item={item}
           selecionado={contatoSelecionado?.id === item.id}
-          onSelecionar={setContatoSelecionado}
+          onSelecionar={selecionarContato}
         />
       )}
       ListHeaderComponent={renderizarCabecalho}
       ListFooterComponent={renderizarRodape}
       ListEmptyComponent={
-        buscaIniciada && !carregandoContatos ? (
+        listaContatosVisivel && buscaIniciada && !carregandoContatos ? (
           <Text style={[globalStyles.textoInformativo, { marginHorizontal: 16 }]}>Nenhum contato encontrado.</Text>
         ) : null
       }
