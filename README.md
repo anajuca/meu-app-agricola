@@ -86,3 +86,6 @@ por exemplo, GPS desligado, câmera ausente ou sensor indisponível.
 `src/styles/globalStyles.js` e o menu em `App.js` usam `Dimensions` /
 `useWindowDimensions` para adaptar a largura dos cards e o número de
 colunas conforme o tamanho da tela e a orientação (retrato/paisagem).
+
+## Vídeo da aplicação
+https://drive.google.com/file/d/1oK3uzsBfaGf0zB52JiXAEjj3jZAY8-yj/view?usp=sharing
